@@ -21,9 +21,7 @@ class Code
   def self.random
     Code.new(VALID_PEG_COLORS.combination(4).to_a.sample)
   end
-#ian explain - don't know what they are askin for & what it means
-#and why do i have to define this
-#i think this is what is messing up my random method
+
   def [](idx)
     pegs[idx]
   end
