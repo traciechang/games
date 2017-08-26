@@ -1,12 +1,13 @@
 require 'byebug'
 class Hangman
   TOTAL_GUESSES = 8
-  attr_reader :guesser, :referee, :board
+  attr_reader :guesser, :referee, :board, :remaining_guesses
 
   def initialize(players = {})
     @guesser = players[:guesser]
     @referee = players[:referee]
     @board = board
+    @remaining_guesses = TOTAL_GUESSES
   end
 
   def setup
@@ -20,6 +21,7 @@ class Hangman
     correct_letters_indices = referee.check_guess(guessed_letter)
     update_board(guessed_letter, correct_letters_indices)
     guesser.handle_response(guessed_letter, correct_letters_indices)
+    @remaining_guesses -= 1 if correct_letters_indices == []
   end
 
   def update_board(guessed_letter, correct_letters_indices)
@@ -31,13 +33,9 @@ class Hangman
   end
 
   def play
-    remaining_guesses = TOTAL_GUESSES
-
     setup
     until remaining_guesses == 0 || ((board.include? nil) == false)
       take_turn
-      update_board(guessed_letter, correct_letters_indices)
-      remaining_guesses -= 1
     end
 
     if remaining_guesses != 0
@@ -50,10 +48,10 @@ end
 
 class HumanPlayer
 
-  attr_reader :guess
+  attr_reader :letters_guessed
 
   def initialize
-    @guess = guess
+    @letters_guessed = []
   end
 
   def pick_secret_word
@@ -66,8 +64,12 @@ class HumanPlayer
   end
 
   def guess(board)
+    print board
+    puts "Letters you've already guessed: #{letters_guessed}"
     puts "Enter your guess:"
-    @guess = gets.chomp.strip
+    guessed_letter = gets.chomp.strip
+    @letters_guessed << guessed_letter
+    guessed_letter
   end
 
   def check_guess(guessed_letter)
@@ -81,13 +83,17 @@ class HumanPlayer
   end
 
   def handle_response(guessed_letter, correct_letters_indices)
-    puts "Keep guessing!"
+    puts "\'#{guessed_letter}\' appears in the following spaces: #{correct_letters_indices}"
   end
 end
 
 class ComputerPlayer
 
   attr_reader :dictionary, :secret_word, :secret_word_length, :filtered_dictionary
+
+  def self.with_dict_file(filename)
+    ComputerPlayer.new(File.readlines(filename).map(&:chomp))
+  end
 
   def initialize(dictionary)
     @dictionary = dictionary
@@ -157,4 +163,18 @@ class ComputerPlayer
   def candidate_words
     filtered_dictionary
   end
+end
+
+if __FILE__ == $PROGRAM_NAME
+  print "Do you want to be the guesser? (yes/no)"
+  answer = gets.chomp.strip
+  if answer == "yes"
+    guesser = HumanPlayer.new
+    referee = ComputerPlayer.with_dict_file("dictionary.txt")
+  else
+    referee = HumanPlayer.new
+    guesser = ComputerPlayer.with_dict_file("dictionary.txt")
+  end
+
+  Hangman.new({guesser: guesser, referee: referee}).play
 end
