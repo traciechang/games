@@ -78,7 +78,7 @@ class HumanPlayer
     if answer == "none"
       []
     else
-      answer.split(", ")
+      answer.split(", ").map { |el| el.to_i }
     end
   end
 
