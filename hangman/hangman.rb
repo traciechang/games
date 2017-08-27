@@ -175,6 +175,5 @@ if __FILE__ == $PROGRAM_NAME
     referee = HumanPlayer.new
     guesser = ComputerPlayer.with_dict_file("dictionary.txt")
   end
-
   Hangman.new({guesser: guesser, referee: referee}).play
 end
