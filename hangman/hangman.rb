@@ -47,7 +47,6 @@ class Hangman
 end
 
 class HumanPlayer
-
   attr_reader :letters_guessed
 
   def initialize
