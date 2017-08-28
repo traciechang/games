@@ -1,6 +1,7 @@
 require 'byebug'
 
 class Code
+  
   attr_reader :pegs
 
   PEGS = Hash.new(Array.new(4))
@@ -71,17 +72,19 @@ class Code
 end
 
 class Game
-  attr_reader :secret_code, :guessed_code
+  
+  attr_reader :secret_code
+  
+  TOTAL_TURNS = 10
 
   def initialize(secret_code = Code.random)
     @secret_code = secret_code
-    @guessed_code = guessed_code
   end
 
   def get_guess
     puts "Enter your guess:"
     begin
-      @guessed_code = Code.parse(gets.chomp)
+      Code.parse(gets.chomp)
     rescue
       puts "Error parsing code"
       retry
@@ -92,4 +95,25 @@ class Game
     print "exact matches: #{guessed_code.exact_matches(secret_code)}"
     print "near matches: #{guessed_code.near_matches(secret_code)}"
   end
+  
+  def play
+    remaining_turns = TOTAL_TURNS
+    guessed_code = get_guess
+    
+    until remaining_turns == 0 || guessed_code.exact_matches(secret_code) == 4
+      display_matches(guessed_code)
+      guessed_code = get_guess
+      remaining_turns -= 1
+    end
+    
+    if guessed_code.exact_matches(secret_code) == 4
+      puts "You win!"
+    else
+      puts "Maybe next time!"
+    end
+  end
+end
+
+if __FILE__ == $PROGRAM_NAME
+  Game.new.play
 end
