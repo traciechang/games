@@ -61,11 +61,26 @@ class Board
   end
 
   def display
+    print "
+      #{grid[0]}
+      #{grid[1]}
+      #{grid[2]}
+      #{grid[3]}
+      #{grid[4]}
+      #{grid[5]}
+      #{grid[6]}
+      #{grid[7]}
+      #{grid[8]}
+      #{grid[9]}
+      #{grid[10]}
+    "
   end
 
   def populate_grid
+    5.times { place_random_ship }
   end
 
   def in_range?(pos)
+    self[pos] == :s
   end
 end
