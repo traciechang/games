@@ -13,8 +13,10 @@ class HumanPlayer
   end
 end
 
-# class Ship
-#   def initialize(size)
-#     @size = size
-#   end
-# end
+class Ship
+  attr_reader :size
+  
+  def initialize(size)
+    @size = size
+  end
+end

@@ -14,12 +14,20 @@ class Board
     self.new(self.default_grid, true)
   end
 
-  attr_reader :grid, :ships
+  attr_reader :grid, :ships, :count_ships
 
   def initialize(grid = self.class.default_grid, random = false)
     @grid = grid
-    @ships = [5, 4, 3, 3, 2]
-    ships.each { |ship| randomize(ship) } if random
+    @ships = {
+      aircraft = Ship.new(5) => [aircraft.size, []],
+      battleship = Ship.new(4) => [battleship.size, []],
+      submarine = Ship.new(3) => [submarine.size, []],
+      destroyer = Ship.new(3) => [destroyer.size, []],
+      patrol = Ship.new(2) => [patrol.size, []]
+      
+    }
+    ships.each { |name, size| randomize(name, size[0]) } if random
+    @count_ships = ships.length
   end
 
   def [](pos)
@@ -33,7 +41,10 @@ class Board
   end
 
   def count
-    grid.flatten.select { |el| el == :s }.length
+    ships.each do |name, size|
+      @count_ships -= 1 if size[1].all? { |space| space == :x }
+    end
+    count_ships
   end
 
   def display
@@ -63,7 +74,7 @@ class Board
     pos.all? { |x| x.between?(0, grid.length - 1) }
   end
 
-  def place_random_ship(ship_size)
+  def place_random_ship(name, ship_size)
     raise "hell" if full?
     two_ships = random_pos(ship_size)
     hor_ship = two_ships[0]
@@ -76,14 +87,20 @@ class Board
     end
     
     if hor_ship.all? { |space|  empty?(space) }
-      hor_ship.each { |space| self[space] = :s}
+      hor_ship.each do |space|
+        self[space] = :s
+        ships[name][1] << space 
+      end
     else
-      ver_ship.each { |space| self[space] = :s}
+      ver_ship.each do |space|
+        self[space] = :s
+        ships[name][1] << space
+      end
     end
   end
 
-  def randomize(ship_size)
-    place_random_ship(ship_size)
+  def randomize(name, ship_size)
+    place_random_ship(name, ship_size)
   end
 
   def random_pos(ship_size)
