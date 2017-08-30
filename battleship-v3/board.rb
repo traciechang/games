@@ -19,7 +19,7 @@ class Board
   def initialize(grid = self.class.default_grid, random = false)
     @grid = grid
     @ships = [5, 4, 3, 3, 2]
-    randomize if random
+    ships.each { |ship| randomize(ship) } if random
   end
 
   def [](pos)
@@ -63,14 +63,14 @@ class Board
     pos.all? { |x| x.between?(0, grid.length - 1) }
   end
 
-  def place_random_ship
+  def place_random_ship(ship_size)
     raise "hell" if full?
-    two_ships = random_pos
+    two_ships = random_pos(ship_size)
     hor_ship = two_ships[0]
     ver_ship = two_ships[1]
 
     until hor_ship.all? { |space| empty?(space) } || ver_ship.all? { |space| empty?(space) }
-      two_ships = random_pos
+      two_ships = random_pos(ship_size)
       hor_ship = two_ships[0]
       ver_ship = two_ships[1]
     end
@@ -82,17 +82,17 @@ class Board
     end
   end
 
-  def randomize(count = ships.length)
-    count.times { place_random_ship }
+  def randomize(ship_size)
+    place_random_ship(ship_size)
   end
 
-  def random_pos
+  def random_pos(ship_size)
     rand_row = rand(size)
     rand_col = rand(size)
     hor_ship = []
     ver_ship = []
     
-    (0...ships.length).each do |num|
+    (0...ship_size).each do |num|
       hor_ship << [rand_row, rand_col + num]
       ver_ship << [rand_row + num, rand_col]
     end
