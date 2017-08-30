@@ -1,115 +1,109 @@
 require 'byebug'
-
 class Board
-  attr_reader :grid
-
-  def initialize(grid = Board.default_grid)
-    @grid = grid
-  end
+  DISPLAY_HASH = {
+    nil => " ",
+    :s => " ",
+    :x => "x"
+  }
 
   def self.default_grid
     Array.new(10) { Array.new(10) }
   end
 
-  # def count
-  #   grid.flatten.select { |space| space == :s }.length
-  # end
+  def self.random
+    self.new(self.default_grid, true)
+  end
+
+  attr_reader :grid, :ships
+
+  def initialize(grid = self.class.default_grid, random = false)
+    @grid = grid
+    @ships = [5, 4, 3, 3, 2]
+    randomize if random
+  end
 
   def [](pos)
     row, col = pos
-    @grid[row][col]
+    grid[row][col]
   end
 
-  def []=(pos, mark)
+  def []=(pos, val)
     row, col = pos
-    @grid[row][col] = mark
+    grid[row][col] = val
   end
 
-  # def empty?(pos = nil)
-  #   if pos
-  #     return true if self[pos] == nil
-  #     return false if self[pos] == :s
-  #   else
-  #     if grid.flatten.include? :s
-  #       false
-  #     else
-  #       true
-  #     end
-  #   end
-  # end
+  def count
+    grid.flatten.select { |el| el == :s }.length
+  end
+
+  def display
+    header = (0..9).to_a.join("  ")
+    p "  #{header}"
+    grid.each_with_index { |row, i| display_row(row, i) }
+  end
+
+  def display_row(row, i)
+    chars = row.map { |el| DISPLAY_HASH[el] }.join("  ")
+    p "#{i} #{chars}"
+  end
+
+  def empty?(pos = nil)
+    if pos
+      self[pos].nil?
+    else
+      count == 0
+    end
+  end
 
   def full?
     grid.flatten.none?(&:nil?)
   end
 
-  def place_random_ship(ship_size)
-    empty_spaces = []
-    if full?
-      raise "Board is full"
-    else
-      grid.each_with_index do |el, idx|
-        el.each_with_index do |space, i|
-          break if i == el.length - ship_size - 1
-          ship_space_hor = []
-          (0...ship_size).each do |num|
-            ship_space_hor << [idx, i+num] if self[[idx, i+num]] == nil
-          end
-          empty_spaces << ship_space_hor
-        end
-        el.each_with_index do |space, i|
-          # debugger if idx == grid.length - ship_size - 1
-          break if idx >= grid.length - ship_size - 1
-          ship_space_ver = []
-          (0...ship_size).each do |num|
-            # debugger
-            ship_space_ver << [idx+num, i] if self[[idx+num, i]] == nil
-          end
-          empty_spaces << ship_space_ver
-        end
-      end
-      empty_spaces.sample.each do |pos|
-        self[pos] == :s
-      end
-      display
-      #debugger
+  def in_range?(pos)
+    pos.all? { |x| x.between?(0, grid.length - 1) }
+  end
+
+  def place_random_ship
+    raise "hell" if full?
+    two_ships = random_pos
+    hor_ship = two_ships[0]
+    ver_ship = two_ships[1]
+
+    until hor_ship.all? { |space| empty?(space) } || ver_ship.all? { |space| empty?(space) }
+      two_ships = random_pos
+      hor_ship = two_ships[0]
+      ver_ship = two_ships[1]
     end
+    
+    if hor_ship.all? { |space|  empty?(space) }
+      hor_ship.each { |space| self[space] = :s}
+    else
+      ver_ship.each { |space| self[space] = :s}
+    end
+  end
+
+  def randomize(count = ships.length)
+    count.times { place_random_ship }
+  end
+
+  def random_pos
+    rand_row = rand(size)
+    rand_col = rand(size)
+    hor_ship = []
+    ver_ship = []
+    
+    (0...ships.length).each do |num|
+      hor_ship << [rand_row, rand_col + num]
+      ver_ship << [rand_row + num, rand_col]
+    end
+    [hor_ship, ver_ship]
+  end
+
+  def size
+    grid.length
   end
 
   def won?
-    grid.flatten.none? { |pos| pos == :s}
-  end
-
-  def display
-    print "
-      #{grid[0]}
-      #{grid[1]}
-      #{grid[2]}
-      #{grid[3]}
-      #{grid[4]}
-      #{grid[5]}
-      #{grid[6]}
-      #{grid[7]}
-      #{grid[8]}
-      #{grid[9]}
-      #{grid[10]}
-    "
-  end
-
-  def populate_grid(ships)
-    ships.each do |ship|
-      place_random_ship(ship.size)
-    end
-  end
-
-  def in_range?(pos)
-    self[pos] == :s
-  end
-end
-
-class Ship
-  attr_reader :size
-  
-  def initialize(size)
-    @size = size
+    grid.flatten.none? { |el| el == :s }
   end
 end
