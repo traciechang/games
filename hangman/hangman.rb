@@ -1,4 +1,5 @@
 require 'byebug'
+
 class Hangman
   TOTAL_GUESSES = 8
   attr_reader :guesser, :referee, :board, :remaining_guesses
