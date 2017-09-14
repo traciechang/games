@@ -1,5 +1,6 @@
 require_relative 'board'
 require_relative 'player'
+require 'byebug'
 
 class Game
     attr_reader :board, :player
@@ -15,6 +16,7 @@ class Game
     
     def play
         board.seed
+        register_bombs
         board.display
         pos = player.get_position
         move = player.get_move
@@ -36,6 +38,13 @@ class Game
         spaces_without_bomb.all? { |space| space.revealed }
     end
 
+    def register_bombs
+        board.grid.flatten.each do |tile|
+            neighboring_bombs = tile.neighbor_bomb_count
+            tile.value = neighboring_bombs if (tile.value != :b) #&& (neighboring_bombs != 0))
+        end
+    end
+    
     def register_move(pos, move)
         if move == "r"
             board[pos].revealed = true
@@ -47,6 +56,4 @@ class Game
 
 end
 
-if __FILE__ == $PROGRAM_NAME
-    Game.new.play
-end
+Game.new.play

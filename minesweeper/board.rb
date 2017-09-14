@@ -4,7 +4,11 @@ require_relative 'tile'
 class Board
     DISPLAY = {
         :b => ["b", "r", "f"],
-        nil => ["*", "_", "f"]
+        #nil => ["*", "_", "f"],
+        0 => ["*", "_", "f"],
+        1 => ["*", "1", "f"],
+        2 => ["*", "2", "f"],
+        3 => ["*", "3", "f"]
     }
     
     attr_reader :grid
