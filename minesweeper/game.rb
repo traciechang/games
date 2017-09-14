@@ -10,6 +10,10 @@ class Game
         @player = Player.new(name: "cersei")
     end
     
+    def all_adjacents_clear?(pos)
+        board[pos].neighbors.all? { |tile| tile.value != :b }
+    end
+    
     def explode?(pos)
         board[pos].value == :b && board[pos].revealed
     end
@@ -41,15 +45,25 @@ class Game
     def register_bombs
         board.grid.flatten.each do |tile|
             neighboring_bombs = tile.neighbor_bomb_count
-            tile.value = neighboring_bombs if (tile.value != :b) #&& (neighboring_bombs != 0))
+            tile.value = neighboring_bombs if (tile.value != :b)
         end
     end
     
     def register_move(pos, move)
         if move == "r"
             board[pos].revealed = true
+            reveal_adjacent_area(pos)
         elsif move == "f"
             !board[pos].flagged ? board[pos].flagged = true : board[pos].flagged = false
+        end
+    end
+    
+    def reveal_adjacent_area(pos)
+        if all_adjacents_clear?(pos)
+            board[pos].neighbors.each do |tile|
+                tile.revealed = true
+                #reveal_adjacent_area(tile.pos)
+            end
         end
     end
     

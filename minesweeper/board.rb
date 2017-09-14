@@ -4,7 +4,6 @@ require_relative 'tile'
 class Board
     DISPLAY = {
         :b => ["b", "r", "f"],
-        #nil => ["*", "_", "f"],
         0 => ["*", "_", "f"],
         1 => ["*", "1", "f"],
         2 => ["*", "2", "f"],
