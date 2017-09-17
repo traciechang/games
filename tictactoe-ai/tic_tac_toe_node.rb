@@ -12,17 +12,27 @@ class TicTacToeNode
 
   def losing_node?(evaluator)
     opp_of_evaluator = (evaluator == :x) ? :o : :x
-    return true if (board.over? && (board.winner == opp_of_evaluator))
-    child_nodes = children
-    child_nodes.each do |child|
-      opp_mark = (child.next_mover_mark == :x) ? :o : :x
-      child.losing_node?(opp_mark)
+    if board.over?
+      return board.won? && (board.winner == opp_of_evaluator)
     end
-    false
+
+    if next_mover_mark == evaluator
+      children.all? { |child| child.losing_node?(evaluator) }
+    else
+      children.any? { |child| child.losing_node?(evaluator) }
+    end
   end
 
   def winning_node?(evaluator)
-    board.over? && board.winner == evaluator
+    if board.over?
+      return board.won? && board.winner == evaluator
+    end
+    
+    if next_mover_mark == evaluator
+      children.any? { |child| child.winning_node?(evaluator) }
+    else
+      children.all? { |child| child.winning_node?(evaluator) }
+    end
   end
 
   # This method generates an array of all moves that can be made after
