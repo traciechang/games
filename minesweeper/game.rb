@@ -58,15 +58,17 @@ class Game
         end
     end
     
+    
     def reveal_adjacent_area(pos)
-        if all_adjacents_clear?(pos)
-            board[pos].neighbors.each do |tile|
-                tile.revealed = true
-                #reveal_adjacent_area(tile.pos)
-            end
+    # if the pos is NOT a bomb and NOT zero, that means, there's a number here and we need to STOP
+        return board[pos] if board[pos].value != :b && !board[pos].value.zero?
+     
+        board[pos].neighbors.each do |tile|
+            next if tile.value == :b || tile.revealed
+            tile.revealed = true
+            reveal_adjacent_area(tile.pos)
         end
     end
-    
 
 end
 
