@@ -65,3 +65,63 @@ class KnightPathFinder
 end
 
 
+class PolyTreeNode
+    attr_reader :value, :parent, :children
+    
+    def initialize(value)
+        @value = value
+        @parent = nil
+        @children = []
+    end
+    
+    def parent
+        @parent
+    end
+    
+    def children
+        @children
+    end
+    
+    def value
+        @value
+    end
+    
+    def parent=(parent)
+        @parent.children.delete(self) if @parent
+        @parent = parent
+        @parent.children << self if !parent.nil?
+    end
+    
+    def add_child(child_node)
+        child_node.parent = self
+    end
+    
+    def remove_child(child_node)
+        raise "Duplicate child" if child_node && !self.children.include?(child_node)
+        child_node.parent = nil
+    end
+    
+    def dfs(target_value)
+        return self if self.value == target_value
+        self.children.each do |child|
+            search_result = child.dfs(target_value)
+            return search_result unless search_result.nil?
+        end
+        nil
+    end
+    
+    def bfs(target_value)
+        nodes = [self]
+        until nodes.empty?
+            first = nodes.shift
+            return first if first.value == target_value
+            nodes = nodes + first.children
+        end
+        nil
+    end
+end
+
+hi = KnightPathFinder.new([0,0])
+hi.build_move_tree
+end_node = hi.find_path([7,6])
+p hi.trace_path_back(end_node)
