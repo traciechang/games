@@ -54,3 +54,5 @@ class Board
         5. times { self[[rand(0..8), rand(0..8)]].value = :b }
     end
 end
+
+# test
