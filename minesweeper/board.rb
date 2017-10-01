@@ -1,4 +1,4 @@
-require 'byebug'
+require 'pry'
 require_relative 'tile'
 
 class Board

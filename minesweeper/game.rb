@@ -1,6 +1,6 @@
 require_relative 'board'
 require_relative 'player'
-require 'byebug'
+require 'pry'
 
 class Game
     attr_reader :board, :player
