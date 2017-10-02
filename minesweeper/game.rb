@@ -4,7 +4,7 @@ require 'pry'
 
 class Game
     attr_reader :board, :player
-    
+
     def initialize
         @board = Board.new
         @player = Player.new(name: "cersei")
