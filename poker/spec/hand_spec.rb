@@ -91,3 +91,9 @@ describe Hand do
     end
     
 end
+
+# Notes:
+# - Rather repeat yourself so each spec is independent
+# - spec for one method shouldn't break/affect another spec
+# Ex: Declare a hand for each spec rather than declare it on top for every one
+# - other things you could have tested: Ex. Royal Flush -> test if flush, if straight, etc.
